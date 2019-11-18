@@ -1,0 +1,41 @@
+﻿@page "/entrar"
+@inject HttpClient client
+@inject AcessoService loginService
+<h3>Entrar</h3>
+
+<div >
+    <EditForm Model="@_login" OnValidSubmit="@(async () => await Submit())">
+        <BSAlert Color="Color.Dark">Alert</BSAlert>
+        
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+        <InputText id="email" Class="form-control" @bind-Value="_login.Login" />
+        <ValidationMessage For="@(() => _login.Login)" />
+        <br />
+        <InputText id="senha" Class="form-control" @bind-Value="_login.Senha" />
+        <ValidationMessage For="@(() => _login.Senha)" />
+        <br />
+        <button type="submit">Entrar</button>
+    </EditForm>
+</div>
+
+@foreach(var error in _errors ?? new List<string>())
+{
+<BSAlert>@error</BSAlert>
+}
+@code {
+    private LoginViewModel _login = new LoginViewModel();
+    private List<string> _errors;
+    private string error;
+    private async Task Submit()
+    {
+        try
+        {
+            var token = await loginService.Login(_login);
+        }
+        catch(HttpException exception)
+        {
+            _errors = exception.Errors;
+        }
+    }
+}
